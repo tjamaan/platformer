@@ -1,9 +1,13 @@
-use bevy::prelude::*;
+use bevy::{input::common_conditions::input_toggle_active, prelude::*};
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
 fn main() {
     // create and run the Bevy app
     App::new()
-        .add_plugins(DefaultPlugins)
+        .add_plugins((
+            DefaultPlugins,
+            WorldInspectorPlugin::new().run_if(input_toggle_active(false, KeyCode::Key1)),
+        ))
         .insert_resource(ClearColor(Color::SALMON))
         .add_systems(Startup, setup)
         .run();
