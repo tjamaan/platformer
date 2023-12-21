@@ -15,13 +15,16 @@ fn main() {
         ))
         .insert_resource(ClearColor(Color::SALMON))
         .add_systems(Startup, setup)
+        .add_systems(Startup, spawn_test_room)
         .run();
 }
 
 fn setup(mut commands: Commands) {
     // spawn a 2D camera.
     commands.spawn(Camera2dBundle::default());
+}
 
+fn spawn_test_room(mut commands: Commands) {
     // spawn a blue rectangle sprite
     commands.spawn((
         SpriteBundle {
@@ -37,19 +40,32 @@ fn setup(mut commands: Commands) {
         Collider::cuboid(15.0, 30.0),
     ));
 
-    // spawn a gray floor
-    commands.spawn((
-        SpriteBundle {
-            sprite: Sprite {
-                color: Color::GRAY,
-                // we need to specify custom_size since we didn't load a texture
-                custom_size: Some(Vec2::new(300.0, 30.0)),
+    // each box is a tuple of (x, y, width, height)
+    let boxes = [
+        (0.0, -300.0, 600.0, 30.0),
+        (0.0, 300.0, 600.0, 30.0),
+        (-300.0, 0.0, 30.0, 600.0),
+        (300.0, 0.0, 30.0, 600.0),
+        (150.0, -200.0, 30.0, 200.0),
+        (50.0, -100.0, 200.0, 30.0),
+        (-100.0, 50.0, 150.0, 30.0),
+    ];
+
+    // spawn gray boxes
+    for (x, y, width, height) in boxes {
+        commands.spawn((
+            SpriteBundle {
+                sprite: Sprite {
+                    color: Color::GRAY,
+                    // we need to specify custom_size since we didn't load a texture
+                    custom_size: Some(Vec2::new(width, height)),
+                    ..default()
+                },
+                transform: Transform::from_translation(Vec3::new(x, y, 0.0)),
                 ..default()
             },
-            transform: Transform::from_translation(Vec3::new(0.0, -300.0, 0.0)),
-            ..default()
-        },
-        RigidBody::Fixed,
-        Collider::cuboid(150.0, 15.0),
-    ));
+            RigidBody::Fixed,
+            Collider::cuboid(width / 2.0, height / 2.0),
+        ));
+    }
 }
